@@ -8,6 +8,8 @@ public class FloorPlanPanel extends JPanel {
     private Controller controller;
     private BoothSize selectedSize = BoothSize.SMALL; // Default size
     private boolean placingBooth = false;
+    private String boothLabel = "S1"; // Default label
+    private int boothCount = 1;
 
     public FloorPlanPanel(Controller controller) {
         this.controller = controller;
@@ -17,12 +19,29 @@ public class FloorPlanPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (placingBooth) {
                     Position position = new Position(e.getX(), e.getY());
-                    controller.makeBooth(selectedSize, position);
+                    String label = generateBoothLabel(selectedSize);
+                    controller.makeBooth(selectedSize, position, label);
                     repaint();
                     placingBooth = false;
                 }
             }
         });
+    }
+
+    private String generateBoothLabel(BoothSize size) {
+        String prefix = "";
+        switch (size) {
+            case SMALL:
+                prefix = "S";
+                break;
+            case MEDIUM:
+                prefix = "M";
+                break;
+            case LARGE:
+                prefix = "L";
+                break;
+        }
+        return prefix + boothCount++;
     }
 
     public void setSelectedSize(BoothSize size) {
