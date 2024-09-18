@@ -1,14 +1,31 @@
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 public class FloorPlan extends FloorPlanComp {
-    Collection<FloorPlanComp> c = new ArrayList<FloorPlanComp>();
+    private static final long serialVersionUID = 1L;
+    Collection<FloorPlanComp> components = new ArrayList<>();
 
     public void add(FloorPlanComp e) {
-        c.add(e);
+        components.add(e);
     }
 
+    @Override
     public void draw(Graphics g) {
-        Iterator<FloorPlanComp> it = c.iterator();
-
-        while(it.hasNext()) 
+        Iterator<FloorPlanComp> it = components.iterator();
+        while (it.hasNext()) {
             it.next().draw(g);
+        }
+    }
+
+    // Method to reinitialize transient fields in components after deserialization
+    public void reinitialize() {
+        for (FloorPlanComp comp : components) {
+            if (comp instanceof Booth) {
+                ((Booth) comp).img = Flyweight.getImg(((Booth) comp).size);
+            }
+            // If there are other component types, handle them here
+        }
     }
 }
