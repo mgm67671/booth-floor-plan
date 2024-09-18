@@ -1,11 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 import java.io.File;
 
 public class GUI extends JFrame {
-    private FloorPlanPanel floorPlanPanel;
-    private Controller controller;
+    Controller controller;
+    BoothSize selectedSize = BoothSize.SMALL; // Default size
+    boolean placingBooth = false;
 
     public GUI(Controller controller) {
         this.controller = controller;
@@ -13,9 +14,9 @@ public class GUI extends JFrame {
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        floorPlanPanel = new FloorPlanPanel(controller);
+        FloorPlanPanel floorPlanPanel = new FloorPlanPanel(controller);
 
-        // Toolbar for selecting booth sizes
+        // Toolbar for selecting booth sizes and saving/loading
         JToolBar toolBar = new JToolBar();
         JButton smallButton = new JButton("Small Booth");
         JButton mediumButton = new JButton("Medium Booth");
@@ -24,15 +25,18 @@ public class GUI extends JFrame {
         JButton loadButton = new JButton("Load Floor Plan");
 
         smallButton.addActionListener((ActionEvent e) -> {
-            floorPlanPanel.setSelectedSize(BoothSize.SMALL);
+            selectedSize = BoothSize.SMALL;
+            placingBooth = true;
         });
 
         mediumButton.addActionListener((ActionEvent e) -> {
-            floorPlanPanel.setSelectedSize(BoothSize.MEDIUM);
+            selectedSize = BoothSize.MEDIUM;
+            placingBooth = true;
         });
 
         largeButton.addActionListener((ActionEvent e) -> {
-            floorPlanPanel.setSelectedSize(BoothSize.LARGE);
+            selectedSize = BoothSize.LARGE;
+            placingBooth = true;
         });
 
         saveButton.addActionListener((ActionEvent e) -> {
@@ -41,6 +45,7 @@ public class GUI extends JFrame {
 
         loadButton.addActionListener((ActionEvent e) -> {
             loadFloorPlan();
+            floorPlanPanel.repaint();
         });
 
         toolBar.add(smallButton);
@@ -51,6 +56,17 @@ public class GUI extends JFrame {
 
         add(toolBar, BorderLayout.NORTH);
         add(floorPlanPanel, BorderLayout.CENTER);
+
+        floorPlanPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (placingBooth) {
+                    controller.add(selectedSize, e.getX(), e.getY());
+                    floorPlanPanel.repaint();
+                    placingBooth = false;
+                }
+            }
+        });
     }
 
     private void saveFloorPlan() {
@@ -69,7 +85,6 @@ public class GUI extends JFrame {
         if (option == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             controller.loadFloorPlan(file.getAbsolutePath());
-            floorPlanPanel.repaint();
             JOptionPane.showMessageDialog(this, "Floor plan loaded successfully.");
         }
     }

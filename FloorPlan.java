@@ -1,31 +1,31 @@
-import java.io.Serializable;
+import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
-public class FloorPlan implements Iterable<Booth>, Serializable {
+public class FloorPlan extends FloorPlanComp {
     private static final long serialVersionUID = 1L;
-    private List<Booth> booths;
-    private double scale; // Scale of the floor plan (e.g., 1 inch represents 5 feet)
+    Collection<FloorPlanComp> components = new ArrayList<>();
 
-    public FloorPlan(double scale) {
-        this.scale = scale;
-        booths = new ArrayList<>();
+    public void add(FloorPlanComp e) {
+        components.add(e);
     }
-
-    public void addBooth(Booth booth) {
-        booths.add(booth);
-    }
-
-    public void removeBooth(Booth booth) {
-        booths.remove(booth);
-    }
-
-    public double getScale() { return scale; }
-    public void setScale(double scale) { this.scale = scale; }
 
     @Override
-    public Iterator<Booth> iterator() {
-        return booths.iterator();
+    public void draw(Graphics g) {
+        Iterator<FloorPlanComp> it = components.iterator();
+        while (it.hasNext()) {
+            it.next().draw(g);
+        }
+    }
+
+    // Method to reinitialize transient fields in components after deserialization
+    public void reinitialize() {
+        for (FloorPlanComp comp : components) {
+            if (comp instanceof Booth) {
+                ((Booth) comp).img = Flyweight.getImg(((Booth) comp).size);
+            }
+            // If there are other component types, handle them here
+        }
     }
 }
