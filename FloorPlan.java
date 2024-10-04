@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 public class FloorPlan extends FloorPlanComp {
     private static final long serialVersionUID = 1L;
-    Collection<FloorPlanComp> components = new ArrayList<>();
+    Collection<FloorPlanComp> components = new ArrayList<FloorPlanComp>();
 
     public void add(FloorPlanComp e) {
         components.add(e);
